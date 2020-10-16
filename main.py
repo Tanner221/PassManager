@@ -44,7 +44,7 @@ def addPass(userName):
   website = input("Website: ")
   password = input("Password: ")
   value = {"website" : website, "password" : password}
-  db.collection("users").document(userName).collection("passwords").add(value)
+  db.collection("users").document(userName).collection("passwords").document(website).set(value)
 
 def findPass(userName):
   website = input("Website: ")
@@ -61,6 +61,28 @@ def findPass(userName):
   else:
     print("NO PASSWORDS SAVED")
 
+def updatePass(userName):
+  website = input("Website: ")
+  result =  db.collection("users").document(userName).collection("passwords")
+  document = result.get()
+  if document:
+    password = input("Enter new password: ")
+    found = result.document(website).update({"password" : password})
+    if found:
+      print("Password updated Successfully")
+    else:
+      print("ERROR: Website Not Found")
+  else:
+    print("NO PASSWORDS SAVED")
+
+def displayAll(userName):
+  snapshot = db.collection("users").document(userName).collection("passwords").get()
+  for x in snapshot:
+    info = x.to_dict()
+    print(f"Website: " + info["website"])
+    print(f"Password:" + info["password"])
+    print("")
+
 def grantedAccess(userName):
   print("Choose from the Options Below:")
   printOptions()
@@ -72,9 +94,9 @@ def grantedAccess(userName):
     elif choice == "b":
       findPass(userName)
     elif choice == 'c':
-      pass
+      updatePass(userName)
     elif choice == 'd':
-      pass
+      displayAll(userName)
     elif choice == 'e':
       printOptions()
     elif choice == 'f':
