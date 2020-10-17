@@ -36,8 +36,9 @@ def printOptions():
   print("b. Find a Password")
   print("c. Edit a Password")
   print("d. Display List of All Passwords")
-  print("e. Show Options")
-  print("f. Quit\n")
+  print("e. Delete Password")
+  print("f. Show Options")
+  print("q. Quit\n")
 
 def addPass(userName):
   print("\nPlease enter the Website and Password to add to your database: \n")
@@ -75,19 +76,32 @@ def updatePass(userName):
   else:
     print("NO PASSWORDS SAVED")
 
+def deletePass(userName):
+  website = input("Website: ")
+  result =  db.collection("users").document(userName).collection("passwords")
+  document = result.get()
+  if document:
+    found = result.document(website).delete()
+    if found:
+      print("Password deleted Successfully")
+    else:
+      print("ERROR: Website Not Found")
+  else:
+    print("NO PASSWORDS SAVED")
+
 def displayAll(userName):
   snapshot = db.collection("users").document(userName).collection("passwords").get()
   for x in snapshot:
     info = x.to_dict()
     print(f"Website: " + info["website"])
-    print(f"Password:" + info["password"])
+    print(f"Password: " + info["password"])
     print("")
 
 def grantedAccess(userName):
   print("Choose from the Options Below:")
   printOptions()
   choice = ' '
-  while choice != 'f':
+  while choice != 'q':
     choice = input("> ")
     if choice == "a":
       addPass(userName)
@@ -98,8 +112,10 @@ def grantedAccess(userName):
     elif choice == 'd':
       displayAll(userName)
     elif choice == 'e':
-      printOptions()
+      deletePass(userName)
     elif choice == 'f':
+      printOptions()
+    elif choice == 'q':
       print("Goodbye!")
     else:
       print("Command Not Recognized\n Try Again:")
